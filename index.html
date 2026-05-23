@@ -54,8 +54,6 @@ const seedAccounts=[
  {id:'u1',name:'Admin Phòng đào tạo',role:'admin',status:'Hoạt động',link:'',username:'admin',password:'123456'},
  {id:'u2',name:'Tài chính bệnh viện',role:'finance',status:'Hoạt động',link:'',username:'taichinh',password:'123456'},
  {id:'u3',name:'Giám đốc bệnh viện',role:'director',status:'Hoạt động',link:'',username:'giamdoc',password:'123456'},
- {id:'u4',name:'Nguyễn Văn An',role:'student',status:'Hoạt động',link:'HV260001',username:'0912345678',password:'123456'},
- {id:'u5',name:'ThS.BS. Lê Văn C',role:'instructor',status:'Hoạt động',link:'i1',username:'0901111222',password:'123456'}
 ];
 let state={logged:false,user:null,role:'admin',page:'dashboard',q:'',courses:load('courses',DEFAULT_COURSES),students:load('students',seedStudents),departments:load('departments',seedDepartments),instructors:load('instructors',seedInstructors),classes:load('classes',seedClasses),accounts:load('accounts',seedAccounts),logs:load('logs',[]),cmeSchedules:load('cmeSchedules',[])};
 COURSES=state.courses;
