@@ -46,6 +46,8 @@ const seedStudents=[
  {id:'HV260001',name:'Nguyễn Văn An',phone:'0912345678',courseId:'c1',status:'Đang thực hành',docs:7,signed:true,paid:true,departmentId:'d3',instructorId:'i1',attendance:36,recordsSubmitted:8,score:'',comment:false,submitted:false,certificate:false},
  {id:'HV260002',name:'Trần Thị Bình',phone:'0987654321',courseId:'c5',status:'Hồ sơ đã duyệt',docs:6,signed:false,paid:false,departmentId:'',instructorId:'',attendance:0,recordsSubmitted:0,score:'',comment:false,submitted:false,certificate:false}
 ];
+const DEMO_STUDENT_PHONES = ['0912345678','0987654321'];
+const DEMO_INSTRUCTOR_PHONES = ['0901111222','0903333444'];
 const seedClasses=[
  {id:'cl1',type:'Lớp chứng chỉ hành nghề',name:'CCHN YHCT khóa 01/2026',courseId:'c1',note:'Lớp thực hành chứng chỉ hành nghề YHCT'},
  {id:'cl2',type:'Lớp đào tạo liên tục',name:'ĐTLT YHCT 24 tiết khóa 01/2026',courseId:'cme24',note:'Lớp đào tạo liên tục y học cổ truyền'}
@@ -92,32 +94,61 @@ function accountKeys(a){let s=state.students.find(x=>x.id===a.link)||{},i=state.
 function login(id){migrateData();let input=normLogin(val('loginUsername'));let a=id?state.accounts.find(x=>x.id===id):state.accounts.find(x=>accountKeys(x).includes(input)); if(!input&&!id)return alert('Vui lòng nhập tài khoản hoặc số điện thoại'); if(!a)return alert('Không tìm thấy tài khoản. Vui lòng kiểm tra lại tên đăng nhập/số điện thoại hoặc liên hệ Phòng đào tạo để được hỗ trợ.'); if(a.status==='Khóa')return alert('Tài khoản đang bị khóa. Vui lòng liên hệ phòng đào tạo/admin để mở khóa.'); let pw=id?val('pw-'+id):val('loginPassword'); if(!pw)return alert('Vui lòng nhập mật khẩu'); if(pw!==(a.password||'123456'))return alert('Sai mật khẩu. Vui lòng kiểm tra lại hoặc dùng chức năng quên mật khẩu.'); state.logged=true;state.user=a.id;state.role=a.role;state.page='dashboard';save();render()}
 function forgotPassword(){let input=normLogin(val('loginUsername'));if(!input)return alert('Nhập tài khoản/số điện thoại trước, hệ thống sẽ gợi ý xử lý.');let a=state.accounts.find(x=>accountKeys(x).includes(input));if(!a)return alert('Không tìm thấy tài khoản để đặt lại mật khẩu. Có thể bấm Khôi phục dữ liệu mẫu nếu đang chạy demo.');alert('MVP demo: mật khẩu hiện tại của tài khoản này là '+(a.password||'123456')+'. Khi triển khai thật sẽ gửi OTP/SMS hoặc yêu cầu admin đặt lại mật khẩu.')}
 function logout(){state.logged=false;state.user=null;render()}
+function pruneDemoData(){
+  // xóa demo accounts theo số điện thoại
+  if(Array.isArray(state.accounts)){
+    state.accounts = state.accounts.filter(a => {
+      const u = (a.username || a.phone || '').toString();
+      return !DEMO_STUDENT_PHONES.includes(u) && !DEMO_INSTRUCTOR_PHONES.includes(u);
+    });
+  }
+
+  // xóa demo học viên theo số điện thoại
+  if(Array.isArray(state.students)){
+    state.students = state.students.filter(s => {
+      const p = (s.phone || '').toString();
+      return !DEMO_STUDENT_PHONES.includes(p);
+    });
+  }
+
+  // nếu bạn có lưu danh sách người hướng dẫn/giảng dạy riêng
+  if(Array.isArray(state.instructors)){
+    state.instructors = state.instructors.filter(i => {
+      const p = (i.phone || '').toString();
+      return !DEMO_INSTRUCTOR_PHONES.includes(p);
+    });
+  }
+}
+
 function resetDemo(){
   if(confirm('Khôi phục dữ liệu mẫu?')){
-    // KHÔNG clear localStorage để giữ các accounts đã tạo (học viên tự đăng ký)
-    const currentAccounts = (state && state.accounts)
-      ? JSON.parse(JSON.stringify(state.accounts))
-      : [];
+    // giữ nguyên tài khoản + học viên đã tạo (để mật khẩu đổi không bị quay lại)
+    const prevAccounts = state.accounts || [];
+    const prevStudents = state.students || [];
+    const prevInstructors = state.instructors || [];
+    const prevClasses = state.classes || [];
 
+    // reset các phần "mẫu" khác
     state = {
       logged:false,
       user:null,
       role:'admin',
       page:'dashboard',
       q:'',
-      courses:JSON.parse(JSON.stringify(DEFAULT_COURSES)),
-      students:JSON.parse(JSON.stringify(seedStudents)),
-      departments:JSON.parse(JSON.stringify(seedDepartments)),
-      instructors:JSON.parse(JSON.stringify(seedInstructors)),
-      classes:JSON.parse(JSON.stringify(seedClasses)),
-
-      // GIỮ accounts hiện tại (bao gồm học viên vừa đăng ký)
-      accounts: currentAccounts,
-
-      logs:[],
+      courses: JSON.parse(JSON.stringify(DEFAULT_COURSES)),
+      students: prevStudents,
+      departments: JSON.parse(JSON.stringify(seedDepartments)),
+      instructors: prevInstructors,
+      classes: prevClasses,
+      accounts: prevAccounts,
+      logs: [],
       cmeSchedules:[]
     };
 
+    // dọn demo student/instructor khỏi dữ liệu đang giữ lại
+    pruneDemoData();
+
+    COURSES = state.courses;
     save();
     render();
   }
