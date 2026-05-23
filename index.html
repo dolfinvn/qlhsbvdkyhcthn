@@ -65,10 +65,21 @@ function migrateData(){
 state.students=(Array.isArray(state.students)?state.students:[])
   .filter(s => !['0912345678','0987654321'].includes((s.phone||'').toString()))
   .map(s=>({documents:{},docReview:{},attendanceLog:[],caseScores:[],competencies:[],subjectPasses:[],...s}));
- state.departments=state.departments&&state.departments.length?state.departments:JSON.parse(JSON.stringify(seedDepartments));
- state.instructors=state.instructors&&state.instructors.length?state.instructors:JSON.parse(JSON.stringify(seedInstructors));
- state.classes=state.classes&&state.classes.length?state.classes:JSON.parse(JSON.stringify(seedClasses));
- state.accounts=state.accounts&&state.accounts.length?state.accounts:JSON.parse(JSON.stringify(seedAccounts));
+ state.departments = Array.isArray(state.departments)
+  ? state.departments
+  : JSON.parse(JSON.stringify(seedDepartments));
+
+state.instructors = Array.isArray(state.instructors)
+  ? state.instructors
+  : JSON.parse(JSON.stringify(seedInstructors));
+
+state.classes = Array.isArray(state.classes)
+  ? state.classes
+  : JSON.parse(JSON.stringify(seedClasses));
+
+state.accounts = Array.isArray(state.accounts)
+  ? state.accounts
+  : JSON.parse(JSON.stringify(seedAccounts));
  seedAccounts.forEach(sa=>{if(!state.accounts.some(a=>a.username===sa.username||a.id===sa.id))state.accounts.push({...sa})});
  state.accounts=state.accounts.map(a=>{let linkedStudent=state.students.find(s=>s.id===a.link),linkedInstructor=state.instructors.find(i=>i.id===a.link);return {...a,username:a.username||a.phone||a.email||(linkedStudent?linkedStudent.phone:'')||(linkedInstructor?linkedInstructor.phone:'')||a.id,password:a.password||'123456',status:a.status||'Hoạt động'} });
  state.logs=state.logs||[];
