@@ -62,7 +62,7 @@ COURSES=state.courses;
 function load(k,seed){try{return JSON.parse(localStorage.getItem('bv_'+k+'_v9'))||seed}catch(e){return seed}}
 function migrateData(){
  state.courses=state.courses&&state.courses.length?state.courses:JSON.parse(JSON.stringify(DEFAULT_COURSES));
- state.students=(state.students&&state.students.length?state.students:JSON.parse(JSON.stringify(seedStudents))).map(s=>({documents:{},docReview:{},attendanceLog:[],caseScores:[],competencies:[],subjectPasses:[],...s}));
+ state.students=(Array.isArray(state.students)?state.students:[]).map(s=>({documents:{},docReview:{},attendanceLog:[],caseScores:[],competencies:[],subjectPasses:[],...s}));
  state.departments=state.departments&&state.departments.length?state.departments:JSON.parse(JSON.stringify(seedDepartments));
  state.instructors=state.instructors&&state.instructors.length?state.instructors:JSON.parse(JSON.stringify(seedInstructors));
  state.classes=state.classes&&state.classes.length?state.classes:JSON.parse(JSON.stringify(seedClasses));
