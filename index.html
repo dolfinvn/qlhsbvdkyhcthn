@@ -96,7 +96,7 @@ function forgotPassword(){let input=normLogin(val('loginUsername'));if(!input)re
 function logout(){state.logged=false;state.user=null;render()}
 function resetDemo(){
   if(confirm('Khôi phục dữ liệu mẫu?')){
-    // Không clear localStorage để không mất accounts (đặc biệt mật khẩu bạn vừa đổi)
+    // KHÔNG clear localStorage để giữ các accounts đã tạo (học viên tự đăng ký)
     const currentAccounts = (state && state.accounts)
       ? JSON.parse(JSON.stringify(state.accounts))
       : [];
@@ -107,13 +107,13 @@ function resetDemo(){
       role:'admin',
       page:'dashboard',
       q:'',
-      courses: JSON.parse(JSON.stringify(DEFAULT_COURSES)),
-      students: JSON.parse(JSON.stringify(seedStudents)),
-      departments: JSON.parse(JSON.stringify(seedDepartments)),
-      instructors: JSON.parse(JSON.stringify(seedInstructors)),
-      classes: JSON.parse(JSON.stringify(seedClasses)),
+      courses:JSON.parse(JSON.stringify(DEFAULT_COURSES)),
+      students:JSON.parse(JSON.stringify(seedStudents)),
+      departments:JSON.parse(JSON.stringify(seedDepartments)),
+      instructors:JSON.parse(JSON.stringify(seedInstructors)),
+      classes:JSON.parse(JSON.stringify(seedClasses)),
 
-      // QUAN TRỌNG: giữ accounts hiện tại (giữ tài khoản học viên vừa đăng ký)
+      // GIỮ accounts hiện tại (bao gồm học viên vừa đăng ký)
       accounts: currentAccounts,
 
       logs:[],
